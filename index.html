@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="message"></p>
+    </div>
+    
+    <script>
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+            const user = accounts.find(user => user.email === email && user.password === password);
+            
+            if (user) {
+                localStorage.setItem('userName', user.name);
+                localStorage.setItem('userRole', user.role);
+                window.location.href = 'home.html'; // توجيه المستخدم إلى الصفحة الرئيسية بعد تسجيل الدخول
+            } else {
+                document.getElementById('message').innerText = 'Invalid email or password';
+            }
+        }
+    </script>
+</body>
+</html>
