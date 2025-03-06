@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الامتحانات</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>الامتحانات</h2>
+        <button id="createQuizBtn" class="hidden">إنشاء امتحان جديد</button>
+        <div id="quizzes">
+            <!-- قائمة الامتحانات هنا -->
+        </div>
+        <div id="quizCreationSection" class="hidden">
+            <h3>إنشاء امتحان جديد</h3>
+            <input type="text" id="question" placeholder="اكتب السؤال هنا">
+            <input type="text" id="option1" placeholder="الخيار 1">
+            <input type="text" id="option2" placeholder="الخيار 2">
+            <input type="text" id="option3" placeholder="الخيار 3">
+            <input type="text" id="option4" placeholder="الخيار 4">
+            <select id="correctAnswer">
+                <option value="1">الخيار 1</option>
+                <option value="2">الخيار 2</option>
+                <option value="3">الخيار 3</option>
+                <option value="4">الخيار 4</option>
+            </select>
+            <button onclick="addQuestion()">إضافة السؤال</button>
+        </div>
+    </div>
+
+    <script>
+        var userRole = localStorage.getItem('userRole') || "guest"; // افترض أن رتبة المستخدم مخزنة في Local Storage
+
+        if (userRole === "teacher") {
+            document.getElementById('createQuizBtn').classList.remove('hidden');
+            document.getElementById('createQuizBtn').onclick = function() {
+                document.getElementById('quizCreationSection').classList.remove('hidden');
+            }
+        }
+
+        function addQuestion() {
+            const question = document.getElementById('question').value;
+            const option1 = document.getElementById('option1').value;
+            const option2 = document.getElementById('option2').value;
+            const option3 = document.getElementById('option3').value;
+            const option4 = document.getElementById('option4').value;
+            const correctAnswer = document.getElementById('correctAnswer').value;
+
+            if (question && option1 && option2 && option3 && option4) {
+                const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+                quizzes.push({ question, options: [option1, option2, option3, option4], correctAnswer });
+                localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                alert('تم إضافة السؤال بنجاح!');
+                document.getElementById('question').value = '';
+                document.getElementById('option1').value = '';
+                document.getElementById('option2').value = '';
+                document.getElementById('option3').value = '';
+                document.getElementById('option4').value = '';
+                document.getElementById('correctAnswer').value = '1';
+                document.getElementById('quizCreationSection').classList.add('hidden');
+                loadQuizzes();
+            }
+        }
+
+        function loadQuizzes() {
+            const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+            const quizzesDiv = document.getElementById('quizzes');
+            quizzesDiv.innerHTML = '';
+            quizzes.forEach((quiz, index) => {
+                const quizElement = document.createElement('div');
+                quizElement.className = 'quiz';
+                quizElement.innerHTML = `
+                    <p>${index + 1}. ${quiz.question}</p>
+                    <ol>
+                        <li>${quiz.options[0]}</li>
+                        <li>${quiz.options[1]}</li>
+                        <li>${quiz.options[2]}</li>
+                        <li>${quiz.options[3]}</li>
+                    </ol>
+                `;
+                quizzesDiv.appendChild(quizElement);
+            });
+        }
+
+        // تحميل الامتحانات عند فتح الصفحة
+        window.onload = loadQuizzes;
+    </script>
+</body>
+</html>
