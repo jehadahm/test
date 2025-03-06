@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصفحة الرئيسية</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>الصفحة الرئيسية</h2>
+        <button id="accountsBtn" class="hidden">الحسابات</button>
+        <button onclick="location.href='chat.html'">المحادثات</button>
+        <button onclick="location.href='quz.html'">الامتحانات</button>
+        
+        <div id="accountsSection" class="hidden">
+            <h3>إدارة الحسابات</h3>
+            <div id="accounts">
+                <!-- هنا ستظهر الحسابات المضافة -->
+            </div>
+            <input type="text" id="newAccountName" placeholder="اسم الحساب الجديد">
+            <input type="email" id="newAccountEmail" placeholder="البريد الإلكتروني">
+            <input type="password" id="newAccountPassword" placeholder="كلمة المرور">
+            <select id="newAccountRole">
+                <option value="student">طالب</option>
+                <option value="teacher">أستاذ</option>
+            </select>
+            <button onclick="addAccount()">إضافة حساب</button>
+        </div>
+    </div>
+
+    <script>
+        // عرض زر الحسابات وإدارة الحسابات فقط إذا كان المستخدم أستاذ
+        var userRole = localStorage.getItem('userRole') || "guest"; 
+
+        if (userRole === "teacher") {
+            document.getElementById('accountsBtn').classList.remove('hidden');
+            document.getElementById('accountsSection').classList.remove('hidden');
+        }
+
+        function loadAccounts() {
+            const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+            const accountsDiv = document.getElementById('accounts');
+            accountsDiv.innerHTML = '';
+            accounts.forEach((account, index) => {
+                const accountElement = document.createElement('div');
+                accountElement.className = 'account';
+                accountElement.innerHTML = `
+                    <span>${account.name} (${account.role})</span>
+                    <button class="deleteBtn" onclick="deleteAccount(${index})">حذف</button>
+                `;
+                accountsDiv.appendChild(accountElement);
+            });
+        }
+
+        function addAccount() {
+            const name = document.getElementById('newAccountName').value;
+            const email = document.getElementById('newAccountEmail').value;
+            const password = document.getElementById('newAccountPassword').value;
+            const role = document.getElementById('newAccountRole').value;
+
+            if (name && email && password) {
+                const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+                accounts.push({ name, email, password, role });
+                localStorage.setItem('accounts', JSON.stringify(accounts));
+                loadAccounts();
+                document.getElementById('newAccountName').value = '';
+                document.getElementById('newAccountEmail').value = '';
+                document.getElementById('newAccountPassword').value = '';
+            }
+        }
+
+        function deleteAccount(index) {
+            const accounts = JSON.parse(localStorage.getItem('accounts')) || [];
+            accounts.splice(index, 1);
+            localStorage.setItem('accounts', JSON.stringify(accounts));
+            loadAccounts();
+        }
+
+        // تحميل الحسابات عند فتح الصفحة
+        window.onload = loadAccounts;
+    </script>
+</body>
+</html>
